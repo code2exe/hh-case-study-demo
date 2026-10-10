@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hh-hello-api
+  namespace: hello-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hh-hello-api
+  template:
+    metadata:
+      labels:
+        app: hh-hello-api
+    spec:
+      containers:
+        - name: hh-hello-api
+          image: <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/hello-api:<TAG>
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: hh-hello-api
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hh-hello-api
+                  key: API_KEY
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
