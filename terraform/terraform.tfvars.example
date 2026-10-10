@@ -1,0 +1,3 @@
+region       = "<REGION>"
+github_owner = "<GITHUB_OWNER>"
+repo_name    = "<REPO_NAME>"
